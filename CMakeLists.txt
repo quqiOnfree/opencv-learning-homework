@@ -14,3 +14,10 @@ find_package(OpenCV REQUIRED)
 add_executable(opencv_project src/main.cpp)
 target_include_directories(opencv_project PRIVATE ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(opencv_project PRIVATE ${OpenCV_LIBS})
+
+add_custom_command(
+    TARGET opencv_project
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_CURRENT_LIST_DIR}/resources/Red_Apple.jpg" "$<TARGET_FILE_DIR:opencv_project>/"
+)
