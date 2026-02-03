@@ -14,7 +14,7 @@
 #include <vector>
 
 /**
- * @brief 加载🍎图片并调用传入的特定格式的函数,并输出新图片
+ * @brief 加载图片并调用传入的特定格式的函数,并输出新图片
  * @param func 需要调用的函数
  * @param output_name 输出的照片名字
  */
@@ -112,20 +112,19 @@ int main() {
 
   load_and_store(
       [make_mask](cv::InputArray src, cv::OutputArray dst) {
-        cv::Mat gray, ranged, bit_and, thrh, dil;
+        cv::Mat gray, ranged, bit_and, thrh;
         make_mask(src, ranged);
         // 灰度化
         cv::cvtColor(src, gray, cv::COLOR_BGR2GRAY);
         // 从掩膜获取图像
         cv::bitwise_and(gray, gray, bit_and, ranged);
-        // 二值化
+        // 自适应二值化
         cv::adaptiveThreshold(bit_and, thrh, 255,
                               cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY,
                               55, 0);
         auto kernel = cv::getStructuringElement(cv::MORPH_RECT, {5, 5});
-        // 膨胀与腐蚀
-        cv::dilate(thrh, dil, kernel);
-        cv::erode(dil, dst, kernel);
+        // 膨胀与腐蚀（闭运算）
+        cv::morphologyEx(thrh, dst, cv::MORPH_CLOSE, kernel);
       },
       "3.2-FeatureExtractionAndProcessing");
 
